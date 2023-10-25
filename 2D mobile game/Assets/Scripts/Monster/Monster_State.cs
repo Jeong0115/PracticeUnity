@@ -34,7 +34,7 @@ public class Monster_MoveState : BaseState
 
     public override void OnStateUpdate()
     {
-
+        monster.MoveToPlayer();
     }
 
     public override void OnStateExit()
@@ -59,6 +59,7 @@ public class Monster_AttackState : BaseState
 
     public override void OnStateExit()
     {
+        monster.attackCollider.enabled = false;
         monster.GetComponent<Animator>().SetBool("isAttack", false);
     }
 }
@@ -70,6 +71,7 @@ public class Monster_HitState : BaseState
     public override void OnStateEnter()
     {
         monster.GetComponent<Animator>().SetTrigger("isHit");
+        monster.KnockBack();
     }
 
     public override void OnStateUpdate()
@@ -90,6 +92,7 @@ public class Monster_DeadState : BaseState
     public override void OnStateEnter()
     {
         monster.GetComponent<Animator>().SetTrigger("isDead");
+        GameManager.Instance.GetExp(monster.exp);
     }
 
     public override void OnStateUpdate()

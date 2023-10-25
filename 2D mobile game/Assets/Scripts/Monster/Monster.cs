@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,11 +17,19 @@ public class Monster : MonoBehaviour
     private State state;
     private FSM fsm;
 
-    [SerializeField] private GameObject player;
-    [SerializeField] private float health = 100.0f;
+    public Collider2D attackCollider;
+
+    [SerializeField] private Player player;
+    [SerializeField] private float moveSpeed = 0.2f;
+    [SerializeField] public int exp = 1;
+    [SerializeField] private GameObject text;
+    [SerializeField] private Transform texPos;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rigid;
+
+    private Health health;
 
     private bool playerInMoveRange = false;
     private bool playerInAttackRange = false;
@@ -29,14 +38,16 @@ public class Monster : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rigid = GetComponent<Rigidbody2D>();
+        health = GetComponent<Health>();
 
         state = State.Idle;
         fsm = new FSM(new Monster_IdleState(this));
 
-        if(player.transform.position.x < transform.position.x)
-        {
-            spriteRenderer.flipX = true;
-        }
+        //if(player.transform.position.x < transform.position.x)
+        //{
+        //    spriteRenderer.flipX = true;
+        //}
     }
 
     void Update()
@@ -78,15 +89,28 @@ public class Monster : MonoBehaviour
 
         if (player.transform.position.x < transform.position.x)
         {
-            spriteRenderer.flipX = true;
+            transform.localScale = new Vector3(-1, 1, 1);
         }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
+    private void OnEnable()
+    {
+        state = State.Idle;
+        player = GameManager.Instance.player;
     }
 
     public void TakeDamage(float damage)
     {
-        health -= damage;
-        
-        if(health <= 0.0f)
+        health.Hit(damage);
+        GameObject damageText = Instantiate(text);
+        damageText.transform.position = texPos.position;
+        damageText.GetComponent<FloatingText>().Print(string.Format("{0:D}",(int)damage));
+
+        if (health.GetHealthRate() <= 0.0f)
         {
             ChangeState(State.Dead);
         }
@@ -129,14 +153,33 @@ public class Monster : MonoBehaviour
             }
         }
     }
+    private void DeadAnimationEnd()
+    {
+        this.gameObject.SetActive(false);
+    }
+
+    public void MoveToPlayer()
+    {
+        transform.position += (player.transform.position - transform.position).normalized * moveSpeed * Time.deltaTime;
+    }
+
+    public void KnockBack()
+    {
+        Vector3 dir = (transform.position - player.transform.position).normalized;
+        rigid.AddForce(dir * 2.0f, ForceMode2D.Impulse);
+    }
 
     public void PlayerInMoveRange(bool inRange)
     {
         playerInMoveRange = inRange;
     }
-
     public void PlayerInAttackRange(bool inRange)
     {
         playerInAttackRange = inRange;
+    }
+
+    private void AttackColliderOn()
+    {
+        attackCollider.enabled = true;
     }
 }

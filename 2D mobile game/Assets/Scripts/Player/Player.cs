@@ -1,17 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Player_move : MonoBehaviour
+public class Player : MonoBehaviour
 {
-    private Transform targetMonster = null;
+    private Transform target = null;
+    private SpriteRenderer spriteRenderer = null;
     private Animator animator;
+    
+    public Health health;
 
     [SerializeField] private Collider2D normalAttackCollider;
 
     public float attackRange = 1.0f;
     public float moveSpeed = 0.5f;
+
+    public float ChriticalChance { get; private set; } = 0.1f;
+    public float Maximization { get; private set; } = 0.0f;
+    public float DamageRange { get; private set; } = 0.6f; // 이 값의 절반 만큼 기본 데미지에서 증가 감소
 
     private enum State
     {
@@ -26,6 +34,7 @@ public class Player_move : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         state = State.Detect;
     }
 
@@ -47,9 +56,16 @@ public class Player_move : MonoBehaviour
 
         }
 
-        if (targetMonster != null)
+        if (target != null)
         {
-            Debug.Log("target distance : " + Vector3.Distance(transform.position, targetMonster.position));
+            if (transform.position.x > target.transform.position.x)
+            {
+                transform.localScale = new Vector3(-1, 1, 1);
+            }
+            else
+            {
+                transform.localScale = new Vector3(1, 1, 1);
+            }
         }
     }
 
@@ -57,7 +73,7 @@ public class Player_move : MonoBehaviour
     {
         FindClosestMonster();
 
-        if(targetMonster != null)
+        if(target != null)
         {
             state = State.Move;
             animator.SetBool("isMove", true);
@@ -66,24 +82,29 @@ public class Player_move : MonoBehaviour
 
     private void move()
     {
-        if (targetMonster != null)
+        if (target != null)
         {
-            if (!targetMonster.gameObject.activeInHierarchy)
+            if (!target.gameObject.activeInHierarchy)
             {
-                targetMonster = null;
+                target = null;
                 state = State.Detect;
                 animator.SetBool("isMove", false);
                 return;
             }
 
-            transform.position += (targetMonster.position - transform.position).normalized * moveSpeed * Time.deltaTime;
+            transform.position += (target.position - transform.position).normalized * moveSpeed * Time.deltaTime;
 
-            float distanceToTarget = Vector3.Distance(transform.position, targetMonster.position);
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
             if (distanceToTarget <= attackRange)
             {
                 animator.SetBool("isMove", false);
+                animator.SetBool("isAttack", true);
                 state = State.Attack;
+            }
+            else
+            {
+                animator.SetBool("isAttack", false);
             }
         }
         else
@@ -95,20 +116,21 @@ public class Player_move : MonoBehaviour
 
     private void attack()
     {
-        if (!targetMonster.gameObject.activeInHierarchy)
-        {
-            targetMonster = null;
-            state = State.Detect;
-            animator.SetBool("isAttack", false);
-        }
-
-        animator.SetBool("isAttack", true);
-
+        
     }
 
     private void wait()
     {
 
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health.Hit(damage);
+
+        if (health.GetHealthRate() <= 0.0f)
+        {
+        }
     }
 
     // 지금 모든 몬스터를 확인 후 거리 비교
@@ -130,7 +152,7 @@ public class Player_move : MonoBehaviour
             }
         }
 
-        targetMonster = closestMonster;
+        target = closestMonster;
     }
 
     private void TurnNormalAttackCollider(int turn)
@@ -142,6 +164,31 @@ public class Player_move : MonoBehaviour
         else if(turn == 1)
         {
             normalAttackCollider.enabled = true;
+        }
+    }
+    
+    private void AttackAnimationEnd()
+    {
+        if (!target.gameObject.activeInHierarchy)
+        {
+            target = null;
+            state = State.Detect;
+            animator.SetBool("isAttack", false);
+        }
+        else
+        {
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+            if (distanceToTarget > attackRange)
+            {
+                animator.SetBool("isMove", true);
+                animator.SetBool("isAttack", false);
+                state = State.Move;
+            }
+            else
+            {
+                animator.SetBool("isAttack", true);
+            }
         }
     }
 }
