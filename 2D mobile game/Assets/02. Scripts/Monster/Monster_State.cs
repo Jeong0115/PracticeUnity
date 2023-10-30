@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 public class Monster_IdleState : BaseState
@@ -93,6 +94,7 @@ public class Monster_DeadState : BaseState
     {
         monster.GetComponent<Animator>().SetTrigger("isDead");
         GameManager.Instance.GetExp(monster.exp);
+        GameManager.Instance.AddGold((BigInteger)monster.gold);
     }
 
     public override void OnStateUpdate()

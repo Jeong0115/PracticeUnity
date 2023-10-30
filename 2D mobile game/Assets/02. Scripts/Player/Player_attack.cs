@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Player_attack : MonoBehaviour
 {
-    [SerializeField] private float damage = 10.0f;
+    [SerializeField] private float damage = 1.0f;
     [SerializeField] private Player player;
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        float realDamage = damage;
+        float realDamage = damage * (float)GameManager.Instance.attackDamage;
         float minDamage = player.DamageRange * player.Maximization - player.DamageRange / 2.0f;
 
         float damageMultiplier = Random.Range(minDamage, player.DamageRange / 2.0f) + 1.0f;

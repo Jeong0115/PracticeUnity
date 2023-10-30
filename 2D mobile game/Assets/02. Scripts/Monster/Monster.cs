@@ -21,9 +21,11 @@ public class Monster : MonoBehaviour
 
     [SerializeField] private Player player;
     [SerializeField] private float moveSpeed = 0.2f;
-    [SerializeField] public int exp = 1;
     [SerializeField] private GameObject text;
     [SerializeField] private Transform texPos;
+
+    public int exp = 1;
+    public int gold = 1;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
@@ -111,11 +113,11 @@ public class Monster : MonoBehaviour
 
         if (critical)
         {
-            damageText.GetComponent<FloatingText>().Print(string.Format("{0:D}", (int)damage), Color.yellow);
+            damageText.GetComponent<FloatingText>().Print(damage, Color.yellow);
         }
         else
         {
-            damageText.GetComponent<FloatingText>().Print(string.Format("{0:D}", (int)damage));
+            damageText.GetComponent<FloatingText>().Print(damage);
         }
 
         if (health.GetHealthRate() <= 0.0f)

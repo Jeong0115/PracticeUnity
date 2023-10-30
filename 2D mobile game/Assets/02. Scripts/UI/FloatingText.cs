@@ -50,9 +50,9 @@ public class FloatingText : MonoBehaviour
         }
     }
 
-    public void Print(string _text, Color? color = null)
+    public void Print(float damage, Color? color = null)
     {
-        text.text = _text;
+        text.text = Function.FloatToString(damage);
         text.color = color ?? Color.white;
     }
 }

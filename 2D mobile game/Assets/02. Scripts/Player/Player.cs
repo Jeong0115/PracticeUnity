@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
 
         GameObject damageText = Instantiate(text);
         damageText.transform.position = texPos.position;
-        damageText.GetComponent<FloatingText>().Print(string.Format("{0:D}", (int)damage), Color.red);
+        damageText.GetComponent<FloatingText>().Print(damage, Color.red);
 
         if (health.GetHealthRate() <= 0.0f)
         {
