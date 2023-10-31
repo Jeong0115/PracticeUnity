@@ -21,4 +21,9 @@ public class Health : MonoBehaviour
     {
         return curHealth / maxHealth;
     }
+
+    public void SetMaxHp()
+    {
+        curHealth = maxHealth;
+    }
 }

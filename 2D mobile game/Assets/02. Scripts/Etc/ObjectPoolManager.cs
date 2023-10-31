@@ -40,4 +40,15 @@ public class ObjectPoolManager : MonoBehaviour
 
         return gameObject;
     }
+
+    public void ClearGameObject(int index)
+    {
+        foreach (GameObject obj in pools[index])
+        {
+            if (obj.activeSelf)
+            {
+                obj.SetActive(false);
+            }
+        }
+    }
 }

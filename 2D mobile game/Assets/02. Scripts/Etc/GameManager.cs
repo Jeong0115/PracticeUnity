@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
 
     public BigInteger attackDamage = 10;
 
-    public int[] maxExp = { 1, 2, 3, 4, 5, 6, 7 };
+    float maxExp = 5.0f;
 
     private void Awake()
     {
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
             EquipmentLevelUp((Equip_type)i);
         }
 
-        gold = 1000000000;
+        gold = 0;
         level = 0;
         exp = 0;
     }
@@ -68,10 +68,11 @@ public class GameManager : MonoBehaviour
     {
         exp += _exp;
 
-        if(exp >= maxExp[level])
+        if(exp >= (int)maxExp)
         {
-            exp -= maxExp[level];
+            exp -= (int)maxExp;
             level++;
+            maxExp *= 1.1f;
         }
     }
 
@@ -82,7 +83,7 @@ public class GameManager : MonoBehaviour
 
     public float GetPlayerExpRate()
     {
-        return (float)exp / (float)maxExp[level];
+        return (float)exp / (float)(int)maxExp;
     }
 
     public void AddGold(BigInteger _gold)

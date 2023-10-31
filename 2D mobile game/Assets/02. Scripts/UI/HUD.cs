@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
 {
-    public enum HUD_type { Exp, Level, Health, Gold, Time };
+    public enum HUD_type { Exp, Level, Health, Gold, Stage, Kill, Time };
     public HUD_type type;
 
     TextMeshProUGUI text;
@@ -14,7 +14,7 @@ public class HUD : MonoBehaviour
 
     private void Awake()
     {
-        text = GetComponent<TextMeshProUGUI>();
+        text = GetComponentInChildren<TextMeshProUGUI>();
         slider = GetComponent<Slider>();
     }
 
@@ -42,7 +42,22 @@ public class HUD : MonoBehaviour
                     slider.value = GameManager.Instance.GetPlayerHealthRate();
                 }
                 break;
-            case HUD_type.Time: break;
+            case HUD_type.Stage:
+                {
+                    text.text = string.Format("스테이지 {0:D}", StageManager.Instance.StageNumber);
+                }
+                break;
+            case HUD_type.Kill:
+                {
+                    slider.value = (float)StageManager.Instance.KillScore / StageManager.Instance.NextStageKillScore;
+                    text.text = string.Format("{0:D} / {1:D}", StageManager.Instance.KillScore, StageManager.Instance.NextStageKillScore);
+                }
+                break;
+            case HUD_type.Time:
+                {
+                    slider.value = (float)StageManager.Instance.CurTime / StageManager.Instance.MaxTime;
+                }
+                break;
             default: break;
         }
     }

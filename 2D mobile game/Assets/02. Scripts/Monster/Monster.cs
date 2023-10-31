@@ -24,8 +24,8 @@ public class Monster : MonoBehaviour
     [SerializeField] private GameObject text;
     [SerializeField] private Transform texPos;
 
-    public int exp = 1;
-    public int gold = 1;
+    public int Exp { get; private set; } = 1;
+    public int Gold = 1545;
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;

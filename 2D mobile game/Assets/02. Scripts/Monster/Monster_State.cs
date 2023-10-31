@@ -93,8 +93,10 @@ public class Monster_DeadState : BaseState
     public override void OnStateEnter()
     {
         monster.GetComponent<Animator>().SetTrigger("isDead");
-        GameManager.Instance.GetExp(monster.exp);
-        GameManager.Instance.AddGold((BigInteger)monster.gold);
+        GameManager.Instance.GetExp(monster.Exp);
+        GameManager.Instance.AddGold((BigInteger)monster.Gold);
+
+        StageManager.Instance.AddKillScore();
     }
 
     public override void OnStateUpdate()
